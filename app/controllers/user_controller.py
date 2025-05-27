@@ -34,11 +34,13 @@ def update_user(user_id, username, email):
     if user:
         user.username = username
         user.email = email
+        user.updated_at = db.func.now()
         db.session.commit()
         return user.to_dict()
     return None
 
 def delete_user(user_id):
+    
     user = User.query.get(user_id)
     if user:
         db.session.delete(user)

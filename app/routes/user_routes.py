@@ -14,7 +14,7 @@ user_bp = Blueprint('user_bp', __name__)
 def fetch_users():
     return jsonify(get_all_users())
 
-@user_bp.route('/<int:user_id>', methods=['GET'])
+@user_bp.route('/<user_id>', methods=['GET'])
 def fetch_user(user_id):
     user = get_user_by_id(user_id)
     if user:
@@ -79,7 +79,7 @@ def logout():
     
     return response
 
-@user_bp.route('/<int:user_id>', methods=['PUT'])
+@user_bp.route('/<user_id>', methods=['PUT'])
 def modify_user(user_id):
     data = request.get_json()
     user = update_user(user_id, data['username'], data['email'])
@@ -87,7 +87,7 @@ def modify_user(user_id):
         return jsonify(user)
     return jsonify({'message': 'User not found'}), 404
 
-@user_bp.route('/<int:user_id>', methods=['DELETE'])
+@user_bp.route('/<user_id>', methods=['DELETE'])
 def remove_user(user_id):
     success = delete_user(user_id)
     if success:

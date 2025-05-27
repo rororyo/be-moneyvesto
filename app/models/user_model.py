@@ -21,6 +21,7 @@ class User(db.Model):
     role = db.Column(ENUM(UserRole), nullable=False, default=UserRole.USER)
     created_at = db.Column(db.TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = db.Column(db.TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+    transactions = db.relationship('Transaction', back_populates='user', cascade='all, delete-orphan')
 
     def set_password(self, raw_password):
         self.password = ph.hash(raw_password)

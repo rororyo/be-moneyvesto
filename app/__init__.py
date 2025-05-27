@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from dotenv import load_dotenv
 from app.routes.user_routes import user_bp
+from app.routes.transaction_routes import transaction_bp
 from app.extensions import db,migrate
 from flask_jwt_extended import JWTManager
 jwt = JWTManager()
@@ -31,6 +32,7 @@ def create_app():
 
     #Registering routes
     app.register_blueprint(user_bp, url_prefix='/api/users')
+    app.register_blueprint(transaction_bp, url_prefix='/api/transactions')
 
     with app.app_context():
         db.create_all()
