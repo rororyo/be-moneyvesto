@@ -23,6 +23,7 @@ class Transaction(db.Model):
   def to_dict(self):
       return {
           'id': str(self.id),
+          'user_id': str(self.user_id),
           'description': self.description,
           'transaction_type': self.transaction_type.value,
           'amount': self.amount,
