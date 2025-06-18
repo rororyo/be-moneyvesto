@@ -18,6 +18,7 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True)
     avatar_url = db.Column(db.String(255), nullable=True)
     password = db.Column(db.String(255), nullable=False)
+    balance = db.Column(db.Integer, nullable=True, default=0)
     role = db.Column(ENUM(UserRole), nullable=False, default=UserRole.USER)
     created_at = db.Column(db.TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
     updated_at = db.Column(db.TIMESTAMP(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
@@ -38,6 +39,7 @@ class User(db.Model):
             'email': self.email,
             'avatar_url': self.avatar_url,
             'role': self.role.value,
+            'balance': self.balance,
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }

@@ -1,4 +1,5 @@
 from app.models.transaction_model import Transaction,TransactionType
+from app.models.user_model import User
 from app.extensions import db
 import app.errors as errors
 from flask import request
@@ -59,10 +60,40 @@ def get_transaction_by_id(transaction_id):
     transaction = db.session.query(Transaction).filter_by(id=transaction_id).first()
     return transaction.to_dict() if transaction else None
 
+def update_user_balance(user_id):
+    """Calculate and update user's balance based on all their transactions"""
+    user = User.query.get(user_id)
+    if not user:
+        return False
+    
+    # Calculate total balance from all transactions
+    transactions = Transaction.query.filter_by(user_id=user_id).all()
+    balance = 0
+    
+    for transaction in transactions:
+        if transaction.transaction_type == TransactionType.DEPOSIT:
+            balance += transaction.total_price
+        elif transaction.transaction_type == TransactionType.WITHDRAWAL:
+            balance -= transaction.total_price
+    
+    user.balance = balance
+    db.session.commit()
+    return True
+
 def create_transaction(user_id, description, transaction_type, amount, total_price):
-    transaction = Transaction(user_id=user_id, description=description, transaction_type=transaction_type, amount=amount, total_price=total_price)
+    transaction = Transaction(
+        user_id=user_id, 
+        description=description, 
+        transaction_type=transaction_type, 
+        amount=amount, 
+        total_price=total_price
+    )
     db.session.add(transaction)
     db.session.commit()
+    
+    # Update user balance after creating transaction
+    update_user_balance(user_id)
+    
     return transaction.to_dict()
 
 def create_multiple_transactions(user_id, transactions_data):
@@ -86,24 +117,39 @@ def create_multiple_transactions(user_id, transactions_data):
         transactions.append(transaction)
     
     db.session.commit()
+    
+    # Update user balance after creating all transactions
+    update_user_balance(user_id)
+    
     return [transaction.to_dict() for transaction in transactions]
 
-def update_transaction(transaction_id,description, transaction_type, amount, total_price):
+def update_transaction(transaction_id, description, transaction_type, amount, total_price):
     transaction = Transaction.query.get(transaction_id)
     if transaction:
+        user_id = transaction.user_id  # Store user_id before updating
+        
         transaction.description = description
         transaction.transaction_type = transaction_type
         transaction.amount = amount
         transaction.total_price = total_price
         db.session.commit()
+        
+        # Update user balance after updating transaction
+        update_user_balance(user_id)
+        
         return transaction.to_dict()
     return None
 
 def delete_transaction(transaction_id):
-    
     transaction = Transaction.query.get(transaction_id)
     if transaction:
+        user_id = transaction.user_id  # Store user_id before deleting
+        
         db.session.delete(transaction)
         db.session.commit()
+        
+        # Update user balance after deleting transaction
+        update_user_balance(user_id)
+        
         return True
     return False

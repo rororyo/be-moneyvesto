@@ -17,6 +17,7 @@ def fetch_transactions():
 @jwt_required()
 def save_transaction():
     data = request.get_json()
+    print(data)
     user_id = get_jwt_identity()
     
     # Check if data is a list (multiple transactions) or dict (single transaction)
