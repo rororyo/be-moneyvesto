@@ -4,7 +4,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
     container_name: moneyvesto-backend
     ports:
       - "5000:5000"
@@ -14,6 +14,7 @@ services:
       - .env
     depends_on:
       - db
+    restart: on-failure # <-- Tambahkan baris ini
 
   db:
     image: postgres:13
